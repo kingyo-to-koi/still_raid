@@ -1415,7 +1415,7 @@ function chooseMonsterIntent() {
         monsterId: m.id,
         type: "BLEED",
         targetIds: targets.map((x) => x.id),
-        text: `${targetNames}을(를) 노려보고 있는 ${m.name}은 옷과 피부를 찢어버릴 태세이다. (출혈 ${n}인, 3턴 지속, 방어 무시)`,
+        text: `${targetNames}을(를) 노려보고 있는 ${m.name}은(는) 옷과 피부를 찢어버릴 태세이다. (출혈 ${n}인, 3턴 지속, 방어 무시)`,
       });
     } else if (pat.buff > 0) {
       // self buff - 버프 비율이 0보다 클 때만
@@ -1427,7 +1427,7 @@ function chooseMonsterIntent() {
         buffStat: s,
         text: `${
           m.name
-        }는 한발 물러서서 태세를 재정비합니다. (자가버프: ${s.toUpperCase()})`,
+        }은(는) 한발 물러서서 태세를 재정비합니다. (자가버프: ${s.toUpperCase()})`,
       });
     } else {
       // fallback: 버프가 0%인데 여기까지 왔으면 단일 공격
@@ -1970,7 +1970,7 @@ function resolveSkill(p, type, key, a) {
     if (type === "ACTIVE" && key === "MADNESS") {
       p.pendingAtkPlusNext += 3;
       log(
-        `😈 ${p.name}의 [스킬:광기]가 발동됩니다. 다음 턴 공격 스탯 +3 (누적 ${p.pendingAtkPlusNext})`
+        `😈 ${p.name}의 [스킬:광기]가 발동됩니다. 다음 턴에서 공격 스탯 +3 됩니다. (누적 ${p.pendingAtkPlusNext})`
       );
       return;
     }
@@ -2003,7 +2003,7 @@ function resolveSkill(p, type, key, a) {
       }
       const cost = Math.ceil(p.hp * 0.3);
       p.hp = Math.max(0, p.hp - cost);
-      log(`🩸 ${p.name} [스킬:혈투] 발동!: HP ${cost} 가 소모됩니다!`);
+      log(`🩸 ${p.name} [스킬:혈투] 발동!: 현재 체력의 30%에 해당하는 HP ${cost} 가 소모됩니다!`);
       setDownIfNeeded(p);
       if (p.down) {
         log(
@@ -2134,9 +2134,9 @@ function resolveSkill(p, type, key, a) {
         sourceId: p.id,
       });
       log(
-        `📣 ${p.name}의 [스킬:격려]가 발동됩니다! → ${
+        `📣 ${p.name}의 [스킬:격려]가 발동됩니다! → 다음 턴에 ${
           ally.name
-        } ${stat.toUpperCase()} +3 (다음 턴 적용)`
+        } ${stat.toUpperCase()} +3 이 적용됩니다.`
       );
       return;
     }
@@ -2153,7 +2153,7 @@ function resolveSkill(p, type, key, a) {
         clearDebuffs(t);
         t.dots = [];
         log(
-          `✨ ${p.name}의 [스킬:정화] → ${t.name} 디버프/DOT를 해제합니다.`
+          `✨ ${p.name}의 [스킬:정화] → ${t.name} 출혈을 해제합니다.`
         );
       }
       return;
