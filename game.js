@@ -1968,7 +1968,7 @@ function resolveSkill(p, type, key, a) {
     }
 
     if (type === "ACTIVE" && key === "MADNESS") {
-      p.pendingAtkPlusNext += 3;
+      p.pendingAtkPlusNext = 3;
       log(
         `😈 ${p.name}의 [스킬:광기]가 발동됩니다. 다음 턴에서 공격 스탯 +3 됩니다. (누적 ${p.pendingAtkPlusNext})`
       );
