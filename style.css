@@ -1,0 +1,559 @@
+:root {
+  --bg: #0f0f14;
+  --panel: #171724;
+  --panel2: #1e1e2e;
+  --text: #eaeaf0;
+  --muted: #a9aac0;
+  --line: #2d2d44;
+  --btn: #2e2e44;
+  --btn2: #3a3a56;
+  --danger: #ff5d5d;
+  --ok: #5dffa5;
+  --warn: #ffd15d;
+  --accent: #7aa0ff;
+  --chip: #26263a;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+h2,
+h3,
+h4 {
+  margin: 8px 0;
+}
+small {
+  color: var(--muted);
+}
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 12px;
+  min-height: calc(100vh - 32px);
+  transition: grid-template-columns 0.3s ease;
+}
+.app.left-collapsed {
+  grid-template-columns: 40px 1fr 1fr;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  overflow: auto;
+  position: relative;
+}
+#leftPanel {
+  transition: all 0.3s ease;
+}
+#leftPanel.collapsed {
+  padding: 8px;
+  overflow: hidden;
+}
+#leftPanel.collapsed > *:not(.collapse-toggle) {
+  display: none;
+}
+#leftPanel.collapsed .collapse-toggle {
+  display: flex;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+}
+.collapse-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--btn);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  z-index: 10;
+}
+.collapse-toggle:hover {
+  background: var(--btn2);
+}
+/* 전투 제어 버튼을 로그 헤더에 배치 */
+.control-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-row button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.panel header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+label {
+  font-size: 12px;
+  color: var(--muted);
+}
+input,
+select {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 8px;
+  outline: none;
+  min-width: 0px;
+  font-size: 13px;
+}
+input[type="number"] {
+  width: 56px;
+  height: 30px;
+  min-width: 0;
+}
+button {
+  background: var(--btn);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--btn2);
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.hr {
+  height: 1px;
+  background: var(--line);
+  margin: 10px 0;
+}
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+  margin-right: 6px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+}
+.statgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.statline {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.hpbar {
+  height: 14px;
+  background: #0b0b12;
+  border: 1px solid #2d2d44;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hpfill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.hpfill.high {
+  background: #5dffa5;
+} /* 60% 이상 */
+.hpfill.mid {
+  background: #ffd15d;
+} /* 30~59% */
+.hpfill.low {
+  background: #ff5d5d;
+} /* 0~29% */
+.danger {
+  color: var(--danger);
+}
+.ok {
+  color: var(--ok);
+}
+.warn {
+  color: var(--warn);
+}
+.log {
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* 전투 로그 스타일 개선 */
+#battleLog {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+#battleLog .log-time {
+  color: #666;
+  font-size: 10px;
+}
+
+#battleLog .log-section {
+  margin: 12px 0 6px 0;
+  padding: 6px 10px;
+  background: rgba(122, 160, 255, 0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+#battleLog .log-round {
+  margin: 16px 0 8px 0;
+  padding: 8px 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(122, 160, 255, 0.2),
+    transparent
+  );
+  border-left: 4px solid var(--accent);
+  font-weight: bold;
+  font-size: 13px;
+  color: #fff;
+}
+
+#battleLog .log-summary {
+  margin: 12px 0;
+  padding: 8px 10px;
+  background: rgba(93, 255, 165, 0.08);
+  border: 1px solid rgba(93, 255, 165, 0.2);
+  border-radius: 6px;
+}
+
+#battleLog .log-attack {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#battleLog .log-heal {
+  color: var(--ok);
+}
+
+#battleLog .log-damage {
+  color: var(--danger);
+}
+
+#battleLog .log-skill {
+  color: var(--warn);
+}
+
+#battleLog .log-crit {
+  color: #ff9f43;
+  font-weight: bold;
+}
+
+#battleLog .log-indent {
+  padding-left: 16px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.stickyFooter {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(
+    transparent,
+    rgba(15, 15, 20, 0.85) 25%,
+    rgba(15, 15, 20, 0.95)
+  );
+  padding-top: 8px;
+  margin-top: 8px;
+}
+.actionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.actionRow > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wide {
+  min-width: 220px;
+}
+.pillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+.mini {
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.rightMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.skillSelect {
+  min-width: 0; /* ⭐ 가장 중요 */
+  max-width: 100%;
+  padding: 6px 8px; /* 높이 줄이기 */
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 중앙 행동 선택 카드 2열 배치 */
+#playerActionCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
+  transition: grid-template-columns 0.3s ease;
+}
+
+/* 왼쪽 패널 접혔을 때 행동 카드 3열 배치 + 컴팩트 스타일 */
+.app.left-collapsed #playerActionCards {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.app.left-collapsed #playerActionCards .card {
+  padding: 8px;
+}
+
+.app.left-collapsed #playerActionCards .card h3 {
+  font-size: 13px;
+  margin: 0;
+}
+
+.app.left-collapsed #playerActionCards .card small {
+  font-size: 10px;
+}
+
+.app.left-collapsed #playerActionCards .chip {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.app.left-collapsed #playerActionCards .actionRow {
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.app.left-collapsed #playerActionCards .actionRow label {
+  font-size: 10px;
+}
+
+.app.left-collapsed #playerActionCards .actionRow select {
+  font-size: 11px;
+  padding: 3px 5px;
+  min-width: 0;
+}
+
+.app.left-collapsed #playerActionCards .rightMeta {
+  display: none;
+}
+
+/* =========================
+   Admin Panel Styles
+   ========================= */
+.admin-panel {
+  background: var(--panel);
+  border: 2px solid #ff6b6b;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.admin-panel h3 {
+  color: #ff6b6b;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-toggle-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.admin-toggle-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #e04848);
+}
+
+.admin-section {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.admin-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+
+.admin-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-row label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 60px;
+}
+
+.admin-row input[type="number"],
+.admin-row input[type="text"] {
+  width: 80px;
+  padding: 4px 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.admin-row select {
+  padding: 4px 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  min-width: 120px;
+}
+
+.admin-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.admin-btn.primary {
+  background: var(--accent);
+  color: #000;
+}
+
+.admin-btn.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.admin-btn.success {
+  background: var(--ok);
+  color: #000;
+}
+
+.admin-btn.warn {
+  background: var(--warn);
+  color: #000;
+}
+
+.admin-btn:hover {
+  opacity: 0.85;
+}
+
+.admin-hidden {
+  display: none;
+}
+
+.admin-log-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-divider {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 12px 0;
+}

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Monster Raid (Vanilla JS ver.3.8.0)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app" id="mainApp">
+      <!-- LEFT: creation -->
+      <section class="panel" id="leftPanel">
+        <button
+          class="collapse-toggle"
+          id="collapseLeftBtn"
+          title="패널 접기/펼치기"
+        >
+          ◀
+        </button>
+        <header>
+          <div>
+            <h2>생성</h2>
+            <small>캐릭터 최대 8명 / 몬스터 최대 4마리</small>
+          </div>
+          <div class="rightMeta">
+            <span class="chip mono" id="roundChip">ROUND 1</span>
+            <span class="chip mono" id="phaseChip">PHASE: HINT</span>
+          </div>
+        </header>
+
+        <div class="card">
+          <h3>⚔️캐릭터 생성⚔️</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>이름</label>
+              <input id="pName" placeholder="예: 마리" />
+            </div>
+
+            <div class="col">
+              <label>직군</label>
+              <select id="pRole">
+                <option value="TANK">탱커</option>
+                <option value="DPS">딜러</option>
+                <option value="SUPPORT">서포터</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="col">
+              <label>체력</label>
+              <input id="pVit" type="number" min="1" max="12" value="7" />
+            </div>
+            <div class="col">
+              <label>공격</label>
+              <input id="pAtk" type="number" min="1" max="12" value="7" />
+            </div>
+            <div class="col">
+              <label>방어</label>
+              <input id="pDef" type="number" min="1" max="12" value="6" />
+            </div>
+            <div class="col">
+              <label>민첩</label>
+              <input id="pAgi" type="number" min="1" max="12" value="6" />
+            </div>
+          </div>
+          <small id="sumHint" class="warn">패시브 포함 스탯 28</small>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="col" style="flex: 1">
+              <label>액티브(택2)</label>
+              <select id="pActive1" class="wide skillSelect"></select>
+              <select id="pActive2" class="wide skillSelect"></select>
+              <small class="muted">액티브는 연속 사용 불가 (A→A 불가)</small>
+            </div>
+            <div class="col" style="flex: 1">
+              <label>궁극기(택1)</label>
+              <select id="pUlt" class="wide skillSelect"></select>
+              <small class="muted">러닝 중 1회</small>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <button id="addPlayerBtn" class="pillBtn">+ 캐릭터 추가</button>
+            <button id="clearPlayersBtn" class="mini">캐릭터 초기화</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>몬스터 생성</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>이름</label>
+              <input id="mName" placeholder="예: MONSTER A" />
+            </div>
+            <div class="col">
+              <label>HP(기본)</label>
+              <input
+                id="mHpBase"
+                type="number"
+                min="50"
+                max="5000"
+                value="500"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>체력</label>
+              <input id="mVit" type="number" min="1" max="20" value="10" />
+            </div>
+            <div class="col">
+              <label>공격</label>
+              <input id="mAtk" type="number" min="1" max="20" value="8" />
+            </div>
+            <div class="col">
+              <label>방어</label>
+              <input id="mDef" type="number" min="1" max="20" value="6" />
+            </div>
+            <div class="col">
+              <label>민첩</label>
+              <input id="mAgi" type="number" min="1" max="20" value="6" />
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <small class="muted">공격 패턴 비율 (합계 100%)</small>
+          <div class="row">
+            <div class="col">
+              <label>단일(%)</label>
+              <input id="mPatSingle" type="number" min="0" max="100" value="25" style="width:50px" />
+            </div>
+            <div class="col">
+              <label>광역(%)</label>
+              <input id="mPatAoe" type="number" min="0" max="100" value="25" style="width:50px" />
+            </div>
+            <div class="col">
+              <label>출혈(%)</label>
+              <input id="mPatBleed" type="number" min="0" max="100" value="25" style="width:50px" />
+            </div>
+            <div class="col">
+              <label>버프(%)</label>
+              <input id="mPatBuff" type="number" min="0" max="100" value="25" style="width:50px" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <button id="addMonsterBtn" class="pillBtn">+ 몬스터 추가</button>
+            <button id="clearMonstersBtn" class="mini">몬스터 초기화</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER: actions -->
+      <section class="panel" id="centerPanel">
+        <header>
+          <div>
+            <h2>행동 선택</h2>
+            <small>각 플레이어의 행동/스킬/대상을 설정</small>
+          </div>
+        </header>
+
+        <div class="card">
+          <h3>현재 암시</h3>
+          <div id="hintBox" class="log">
+            라운드 시작 버튼을 눌러 암시를 생성하세요.
+          </div>
+        </div>
+
+        <div class="cards" id="playerActionCards"></div>
+
+        <div class="stickyFooter">
+          <div class="row" style="justify-content: space-between">
+            <div class="row">
+              <button id="autoFillBtn" class="mini">
+                자동 입력(기본 공격)
+              </button>
+              <button id="clearActionsBtn" class="mini">행동 초기화</button>
+            </div>
+            <div class="row">
+              <span class="chip mono" id="readyChip">READY: 0/0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: logs -->
+      <section class="panel" id="rightPanel">
+        <header>
+          <div>
+            <h2>로그</h2>
+            <small>HP/스탯 변화, 상태이상, 피해/경감 내역</small>
+          </div>
+        </header>
+
+        <!-- 전투 제어 버튼 (일렬로 배치) -->
+        <div class="card" style="padding: 8px 12px; margin-bottom: 8px">
+          <div class="control-row">
+            <button id="startRoundBtn" class="pillBtn">1) 라운드 시작</button>
+            <button id="resolveBtn" class="pillBtn">2) 라운드 합산</button>
+            <button id="undoBtn" class="pillBtn" style="background: #e67e22">
+              ↩ 되돌리기
+            </button>
+            <button id="resetBattleBtn" class="mini">전투 리셋</button>
+            <span style="flex-grow: 1"></span>
+            <button id="copyLogBtn" class="mini">📷 로그 캡쳐</button>
+            <button id="clearLogBtn" class="mini">로그 비우기</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>몬스터 상태</h3>
+          <div id="monsterState" class="log">몬스터가 없습니다.</div>
+        </div>
+
+        <div class="card">
+          <h3>플레이어 상태</h3>
+          <div id="playerState" class="log">플레이어가 없습니다.</div>
+        </div>
+
+        <div class="card">
+          <h3>전투 로그</h3>
+          <div id="battleLog" class="log"></div>
+        </div>
+
+        <!-- ========== 관리자 패널 ========== -->
+        <button id="adminToggleBtn" class="admin-toggle-btn">🔧 관리자 패널 열기</button>
+        
+        <div id="adminPanelContent" class="admin-panel admin-hidden">
+          <h3>🔧 관리자 패널 (GM 전용)</h3>
+          
+          <!-- 수동 로그 추가 -->
+          <div class="admin-section">
+            <h4>📝 수동 로그 추가</h4>
+            <input type="text" id="adminLogInput" class="admin-log-input" placeholder="GM 메모를 입력하세요..." />
+            <button id="adminAddLogBtn" class="admin-btn primary">로그 추가</button>
+          </div>
+
+          <hr class="admin-divider" />
+
+          <!-- 플레이어 HP 설정 -->
+          <div class="admin-section">
+            <h4>💚 플레이어 HP 설정</h4>
+            <div class="admin-row">
+              <select id="adminPlayerHpSelect" class="admin-player-select"></select>
+              <input type="number" id="adminPlayerHpInput" placeholder="HP" min="0" />
+              <button id="adminSetPlayerHpBtn" class="admin-btn primary">설정</button>
+            </div>
+          </div>
+
+          <!-- 플레이어 다운/부활 토글 -->
+          <div class="admin-section">
+            <h4>💀 플레이어 다운/부활</h4>
+            <div class="admin-row">
+              <select id="adminPlayerDownSelect" class="admin-player-select"></select>
+              <button id="adminToggleDownBtn" class="admin-btn warn">다운/부활 토글</button>
+            </div>
+          </div>
+
+          <!-- 플레이어 스탯 임시 조정 -->
+          <div class="admin-section">
+            <h4>📊 플레이어 스탯 임시 조정</h4>
+            <div class="admin-row">
+              <select id="adminPlayerStatSelect" class="admin-player-select"></select>
+              <select id="adminStatType">
+                <option value="atk">ATK</option>
+                <option value="def">DEF</option>
+                <option value="agi">AGI</option>
+                <option value="vit">VIT</option>
+              </select>
+              <input type="number" id="adminStatDelta" placeholder="±값" value="0" />
+              <button id="adminAdjustStatBtn" class="admin-btn primary">조정</button>
+            </div>
+          </div>
+
+          <!-- 플레이어 상태 초기화 -->
+          <div class="admin-section">
+            <h4>🔄 플레이어 상태 초기화</h4>
+            <div class="admin-row">
+              <select id="adminPlayerResetSelect" class="admin-player-select"></select>
+              <button id="adminResetStatusBtn" class="admin-btn danger">모든 상태 초기화</button>
+            </div>
+            <small style="color: var(--muted); font-size: 11px;">디버프/DOT/보호막/수호/버프 모두 제거</small>
+          </div>
+
+          <hr class="admin-divider" />
+
+          <!-- 몬스터 HP 설정 -->
+          <div class="admin-section">
+            <h4>👹 몬스터 HP 설정</h4>
+            <div class="admin-row">
+              <select id="adminMonsterHpSelect" class="admin-monster-select"></select>
+              <input type="number" id="adminMonsterHpInput" placeholder="HP" min="0" />
+              <button id="adminSetMonsterHpBtn" class="admin-btn primary">설정</button>
+            </div>
+          </div>
+
+          <!-- 몬스터 스탯 조정 -->
+          <div class="admin-section">
+            <h4>👹 몬스터 스탯 임시 조정</h4>
+            <div class="admin-row">
+              <select id="adminMonsterStatSelect" class="admin-monster-select"></select>
+              <select id="adminMonsterStatType">
+                <option value="atk">ATK</option>
+                <option value="def">DEF</option>
+                <option value="agi">AGI</option>
+                <option value="vit">VIT</option>
+              </select>
+              <input type="number" id="adminMonsterStatDelta" placeholder="±값" value="0" />
+              <button id="adminAdjustMonsterStatBtn" class="admin-btn primary">조정</button>
+            </div>
+          </div>
+
+          <hr class="admin-divider" />
+
+          <!-- 피해/회복 직접 적용 -->
+          <div class="admin-section">
+            <h4>⚔️ 피해/회복 직접 적용</h4>
+            <div class="admin-row">
+              <select id="adminDamageTargetType">
+                <option value="player">플레이어</option>
+                <option value="monster">몬스터</option>
+              </select>
+              <select id="adminDamageTargetSelect"></select>
+            </div>
+            <div class="admin-row">
+              <input type="number" id="adminDamageAmount" placeholder="양수=피해, 음수=회복" />
+              <button id="adminApplyDamageBtn" class="admin-btn danger">적용</button>
+            </div>
+            <small style="color: var(--muted); font-size: 11px;">양수 입력 시 피해, 음수 입력 시 회복</small>
+          </div>
+
+        </div>
+        <!-- ========== 관리자 패널 끝 ========== -->
+
+      </section>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
