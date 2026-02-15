@@ -2136,7 +2136,7 @@ function resolveSkill(p, type, key, a) {
       log(
         `📣 ${p.name}의 [스킬:격려]가 발동됩니다! → ${
           ally.name
-        } ${stat.toUpperCase()} +2 (다음 턴 적용)`
+        } ${stat.toUpperCase()} +3 (다음 턴 적용)`
       );
       return;
     }
